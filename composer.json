@@ -12,20 +12,23 @@
   "require": {
     "php": ">=8.2"
   },
+
   "require-dev": {
-    "phpunit/phpunit": "@stable",
     "phpstan/phpstan": "@stable",
-    "squizlabs/php_codesniffer": "@stable"
+    "squizlabs/php_codesniffer": "@stable",
+    "testo/testo": "^0.10.8"
   },
+
   "scripts": {
     "test": [
       "@composer install",
       "@phpcs",
-      "@phpstan"
+      "@phpstan",
+      "@testo"
     ],
     "phpcs": "./vendor/bin/phpcs",
     "phpstan": "./vendor/bin/phpstan analyse --memory-limit=-1",
-    "phpunit": "./vendor/bin/phpunit",
+    "testo": "./vendor/bin/testo",
     "infection": "./vendor/bin/infection --show-mutations"
   },
   "autoload": {

@@ -7,10 +7,10 @@ namespace Cekta\Queue\Test;
 use Cekta\Queue\Status;
 use Cekta\Queue\TaskDTO;
 use DateTimeImmutable;
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
+use Testo\Assert;
+use Testo\Test;
 
-class TaskDTOTest extends TestCase
+final class TaskDTOTest
 {
     #[Test]
     public function shouldCreateTaskDTO(): void
@@ -24,18 +24,18 @@ class TaskDTOTest extends TestCase
 
         $dto = new TaskDTO($uuid, $fqcn, $handler, $payload, $status, $createdAt);
 
-        $this->assertSame($uuid, $dto->uuid);
-        $this->assertSame($fqcn, $dto->fqcn);
-        $this->assertSame($handler, $dto->handler);
-        $this->assertSame($payload, $dto->payload);
-        $this->assertSame($status, $dto->current_status);
-        $this->assertSame($createdAt, $dto->created_at);
+        Assert::same($dto->uuid, $uuid);
+        Assert::same($dto->fqcn, $fqcn);
+        Assert::same($dto->handler, $handler);
+        Assert::same($dto->payload, $payload);
+        Assert::same($dto->current_status, $status);
+        Assert::same($dto->created_at, $createdAt);
     }
 
     #[Test]
     public function shouldBeReadonly(): void
     {
         $reflection = new \ReflectionClass(TaskDTO::class);
-        $this->assertTrue($reflection->isReadOnly());
+        Assert::true($reflection->isReadOnly());
     }
 }

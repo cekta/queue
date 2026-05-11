@@ -8,7 +8,7 @@ interface Producer
 {
     /**
      * @param Task $task
-     * @return string uuid
+     * @return string uuid or bigint, ordered number
      */
     public function send(Task $task): string;
 }
