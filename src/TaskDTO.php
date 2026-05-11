@@ -13,5 +13,6 @@ readonly class TaskDTO
         public mixed $payload,
         public Status $current_status,
         public DateTimeImmutable $created_at,
-    ) {}
+    ) {
+    }
 }
