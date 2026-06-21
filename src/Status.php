@@ -9,5 +9,5 @@ enum Status: string
     case PENDING = 'pending';
     case SUCCESS = 'success';
     case FAIL = 'fail';
-    case IN_PROGRESS  = 'in progress';
+    case PROCESSING  = 'processing';
 }

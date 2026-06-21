@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Cekta\Queue;
 
+use JsonSerializable;
+
 interface Producer
 {
     /**
-     * @param Task $task
-     * @return string uuid or bigint, ordered number
+     * @param JsonSerializable $payload opbject, jsonSerialize() transform to task payload
+     * @return string uuid
      */
-    public function send(Task $task): string;
+    public function send(JsonSerializable $payload): string;
 }

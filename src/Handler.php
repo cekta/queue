@@ -6,8 +6,5 @@ namespace Cekta\Queue;
 
 interface Handler
 {
-    /**
-     * @return bool true on success handle
-     */
-    public function handle(TaskDTO $taskDTO): bool;
+    public function handle(Task $task): bool;
 }

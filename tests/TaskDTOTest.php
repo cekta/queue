@@ -21,15 +21,28 @@ final class TaskDTOTest
         $payload = ['key' => 'value'];
         $status = Status::PENDING;
         $createdAt = new DateTimeImmutable('2024-01-01');
+        $startedAt = new DateTimeImmutable('2024-01-02');
+        $finishedAt = new DateTimeImmutable('2024-01-03');
 
-        $dto = new TaskDTO($uuid, $fqcn, $handler, $payload, $status, $createdAt);
+        $dto = new TaskDTO(
+            $uuid,
+            $fqcn,
+            $handler,
+            $payload,
+            $status,
+            $createdAt,
+            $startedAt,
+            $finishedAt
+        );
 
-        Assert::same($dto->uuid, $uuid);
-        Assert::same($dto->fqcn, $fqcn);
-        Assert::same($dto->handler, $handler);
-        Assert::same($dto->payload, $payload);
-        Assert::same($dto->current_status, $status);
-        Assert::same($dto->created_at, $createdAt);
+        Assert::same($dto->getUuid(), $uuid);
+        Assert::same($dto->getFqcn(), $fqcn);
+        Assert::same($dto->getHandler(), $handler);
+        Assert::same($dto->getPayload(), $payload);
+        Assert::same($dto->getStatus(), $status);
+        Assert::same($dto->getCreatedAt(), $createdAt);
+        Assert::same($dto->getStartedAt(), $startedAt);
+        Assert::same($dto->getFinishedAt(), $finishedAt);
     }
 
     #[Test]
