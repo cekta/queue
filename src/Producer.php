@@ -12,5 +12,5 @@ interface Producer
      * @param JsonSerializable $payload opbject, jsonSerialize() transform to task payload
      * @return string uuid
      */
-    public function send(JsonSerializable $payload): string;
+    public function push(JsonSerializable $payload): string;
 }
