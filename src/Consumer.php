@@ -6,5 +6,7 @@ namespace Cekta\Queue;
 
 interface Consumer
 {
-    public function findNext(): ?Task;
+    public function stop(): void;
+    public function run(): int;
+    public function runOnce(): void;
 }
