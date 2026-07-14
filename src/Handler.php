@@ -10,6 +10,6 @@ interface Handler
      * payload class for handle
      * @return class-string
      */
-    public function forType(): string;
+    public static function getHandledType(): string;
     public function handle(Task $task): bool;
 }
