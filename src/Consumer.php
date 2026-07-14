@@ -9,4 +9,5 @@ interface Consumer
     public function stop(): void;
     public function run(): int;
     public function runOnce(): void;
+    public function failExpiredTasks(int $expiredSecond): int;
 }
