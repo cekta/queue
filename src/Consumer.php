@@ -6,8 +6,16 @@ namespace Cekta\Queue;
 
 interface Consumer
 {
-    public function stop(): void;
-    public function run(): int;
-    public function runOnce(): void;
-    public function failExpiredTasks(int $expiredSecond): int;
+    /**
+     * Fetches and processes a single task from the queue.
+     *
+     * This method performs a single, atomic consumption cycle: it pulls the next
+     * available task, routes it to the appropriate Handler, updates its status,
+     * and immediately returns. The infinite loop or scheduling mechanism must be
+     * implemented externally.
+     *
+     * @return string|null The unique identifier (UUID) of the processed task,
+     *                     or null if the queue was empty.
+     */
+    public function consume(): ?string;
 }

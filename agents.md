@@ -1,134 +1,43 @@
-# Агенты и архитектура CEKTA/Queue
+# AI Agent Rules for Cekta\Queue
 
-## Обзор
+You are an expert AI assistant specializing in software architecture, clean code, and PHP development. 
+When writing, refactoring, or reviewing code for the `Cekta\Queue` ecosystem, you must strictly adhere to the rules and architectural principles defined below.
 
-**CEKTA/Queue** — это PHP-библиотека, предоставляющая интерфейсы (абстракцию) над системами очередей сообщений (RabbitMQ, Kafka, Redis, Beanstalk, СУБД и др.).
+## Core Components
 
-Библиотека определяет базовые интерфейсы (контракты), а реализации под конкретные брокеры (RabbitMQ, Kafka, Redis, БД и др.) предоставляются пользователем.
+* **PHP Version**: Requires `PHP >=8.3`.
+* **Core Namespace**: `Cekta\Queue\*`.
+* **Code Style**: PSR12.
+* **Infection (`infection.json`)**: Used for mutation testing.
+* **PHPStan `phpstan.neon`**: Static analysis tool.
+* **PHP Code Sniffer (`squizlabs/php_codesniffer:4.0.1`, `phpcs.xml`)**: Enforces coding standards.
+* `phpstan/phpstan`: `@stable` - Static analysis.
+* `squizlabs/php_codesniffer`: `@stable` - Code style analysis.
+* `testo/testo`: `^0.10.8` - Testing framework.
+* `make shell` get shell with current environment, run all commends here.
+* `make test-8.3` build php 8.3 environment and run test, must be always success.
+* `make test-8.4` build php 8.4 environment and run test, must be always success.
+* `make test-8.5` build php 8.5 environment and run test, must be always success.
 
-## Архитектура
+### `src/` - PHP FILES
 
-Проект построен на принципе разделения ответственности между несколькими ключевыми компонентами:
+* `src/Consumer.php`: Responsible for retrieving and processing tasks from the queue.
+* `src/Handler.php`: Defines the logic for executing specific tasks.
+* `src/Producer.php`: Adds new tasks to the queue.
+* `src/StaleCleaner.php`: Identifies and handles tasks that are stale or no longer active.
+* `src/Status.php`: Likely an enum or a class defining the possible states of a task (e.g., pending, processing, completed, failed).
+* `src/Task.php`: Represents a single unit of work or message in the queue.
+* `src/TaskDTO.php`: A Data Transfer Object for tasks, used to encapsulate task data.
+* `src/TaskLocator.php`: A service for finding or resolving task handlers based on task types or other criteria.
 
-```
-┌───────────────────┐
-│     Producer      │     Producer принимает произвольный JsonSerializable-объект
-│   (отправитель)   │────▶ и ставит его в очередь. Возвращает UUID задачи.
-└────────┬──────────┘
-         │  send(JsonSerializable $payload): string
-         ▼
-┌──────────────────────────────────┐
-│  Внешняя очередь / Брокер        │     Конкретная реализация (RabbitMQ, Kafka,
-│  (не входит в библиотеку)        │     Redis, БД и т.д.) — предоставляется
-│                                  │     пользователем библиотеки.
-└──────────────────────────────────┘
-         │
-         ▼
-┌───────────────────┐
-│     Handler       │     Handler получает Task (с payload из исходного объекта)
-│   (исполнитель    │     и выполняет бизнес-логику.
-│    задачи)        │     Метод handle(Task $task): bool.
-└───────────────────┘
+### `docs/` documentation directory.
 
-┌───────────────────┐
-│  TaskRepository   │     Позволяет найти задачу по UUID.
-│  (репозиторий)    │     Метод findByUuid(string $uuid): ?Task.
-└───────────────────┘
-```
+* **mdbook** - documentation tools
+* `docs/SUMMARY.md`: main menu documentation
+* `book.toml`: Suggests the use of `mdBook` for creating documentation from Markdown files in the `docs/` directory.
+* `readme.md`: Project main README.
 
-## Основные сущности
+### Containerization:
+* `Dockerfile`: Defines the Docker image for the application.
+* `docker-compose.yml`: Defines and runs multi-container Docker applications, including `app` and `pages` services.
 
-| Компонент | Описание | Зона ответственности |
-|-----------|----------|---------------------|
-| **Task** | Интерфейс задачи | Определяет структуру задачи, содержит uuid, fqcn, handler, payload, status, даты |
-| **TaskDTO** | DTO-реализация Task (final readonly) | Хранит и отдаёт все поля задачи |
-| **Status** | Enum статусов | PENDING, PROCESSING, SUCCESS, FAIL |
-| **Producer** | Отправитель задач | Принимает `JsonSerializable $payload`, возвращает `string` (uuid). Его `jsonSerialize()` станет payload задачи |
-| **Handler** | Обработчик задач | Выполняет бизнес-логику. Метод `handle(Task $task): bool` |
-| **TaskRepository** | Репозиторий | Поиск задачи по UUID: `findByUuid(string $uuid): ?Task` |
-
-## Жизненный цикл задачи
-
-1. **PENDING** — задача создана и ожидает обработки
-2. **PROCESSING** — задача взята в обработку
-3. **SUCCESS/FAIL** — задача завершена (успешно или с ошибкой)
-
-## Пример использования
-
-### 1. Определение бизнес-задачи (domain object)
-
-Пользователь определяет произвольный класс, реализующий `JsonSerializable`. Этот класс описывает данные, которые будут поставлены в очередь.
-
-```php
-use JsonSerializable;
-
-final readonly class EmailNotification implements JsonSerializable
-{
-    public function __construct(
-        private string $to,
-        private string $subject,
-        private string $body,
-    ) {}
-
-    public function jsonSerialize(): array
-    {
-        return [
-            'to' => $this->to,
-            'subject' => $this->subject,
-            'body' => $this->body,
-            'type' => 'email',
-        ];
-    }
-}
-```
-
-### 2. Реализация обработчика (Handler)
-
-Обработчик получает `Task`, внутри которого `payload` — это данные, которые вернул `jsonSerialize()` из первоначального объекта.
-
-```php
-use Cekta\Queue\Handler;
-use Cekta\Queue\Task;
-
-class EmailNotificationHandler implements Handler
-{
-    public function handle(Task $task): bool
-    {
-        /** @var array{to: string, subject: string, body: string} $payload */
-        $payload = $task->getPayload();
-        
-        // Отправка email...
-        // $payload['to'], $payload['subject'], $payload['body']
-        
-        return true;
-    }
-}
-```
-
-### 3. Использование Producer
-
-Producer принимает `JsonSerializable $payload` и возвращает UUID поставленной задачи.
-
-```php
-$producer = new SomeRabbitMQProducer(); // конкретная реализация Producer
-$uuid = $producer->send(new EmailNotification(
-    to: 'user@example.com',
-    subject: 'Hi',
-    body: 'Hello!',
-));
-
-echo $uuid; // UUID задачи, под которым она хранится в очереди
-```
-
-> **Как это работает**: `send()` получает `$payload` — произвольный `JsonSerializable`. Его `jsonSerialize()` будет сохранён в очереди. Когда обработчик (`Handler`) получит задачу, эти данные станут доступны через `Task::getPayload()`.
-
-## Требования
-
-- PHP >= 8.2
-- **Перед отправкой PR обязателен запуск `make test`** — запускает все проверки (phpcs, phpstan, testo) в Docker
-
-## Дополнительные возможности
-
-- **TaskRepository** — позволяет найти задачу по UUID
-- **Идемпотентность** — обеспечивается через UUID (рекомендуется UUID v7)
-- **Payload** — произвольные данные, передаваемые в Handler

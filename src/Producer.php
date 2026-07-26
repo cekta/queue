@@ -9,8 +9,10 @@ use JsonSerializable;
 interface Producer
 {
     /**
-     * @param JsonSerializable $payload opbject, jsonSerialize() transform to task payload
-     * @return string uuid
+     * Pushes a new task payload into the queue.
+     *
+     * @param JsonSerializable $message The task data object to be serialized into JSON.
+     * @return string The unique identifier (UUID) of the created task.
      */
-    public function push(JsonSerializable $payload): string;
+    public function produce(JsonSerializable $message): string;
 }
