@@ -17,7 +17,6 @@ final class TaskDTOTest
     {
         $uuid = 'test-uuid-123';
         $fqcn = 'SomeClass';
-        $handler = 'SomeHandler';
         $payload = ['key' => 'value'];
         $status = Status::PENDING;
         $createdAt = new DateTimeImmutable('2024-01-01');
@@ -27,7 +26,6 @@ final class TaskDTOTest
         $dto = new TaskDTO(
             $uuid,
             $fqcn,
-            $handler,
             $payload,
             $status,
             $createdAt,
@@ -37,7 +35,6 @@ final class TaskDTOTest
 
         Assert::same($dto->getUuid(), $uuid);
         Assert::same($dto->getFqcn(), $fqcn);
-        Assert::same($dto->getHandler(), $handler);
         Assert::same($dto->getPayload(), $payload);
         Assert::same($dto->getStatus(), $status);
         Assert::same($dto->getCreatedAt(), $createdAt);

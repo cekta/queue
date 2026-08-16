@@ -11,14 +11,9 @@ interface Task
     public function getUuid(): string;
 
     /**
-     * Returns the Fully Qualified Class Name (FQCN) of the task message/DTO.
+     * Returns the Fully Qualified Class Name (FQCN) of message.
      */
     public function getFqcn(): string;
-
-    /**
-     * Returns the Fully Qualified Class Name (FQCN) of the handler responsible for processing this task.
-     */
-    public function getHandler(): string;
 
     /**
      * Returns the decoded task payload that was previously serialized by the Producer.

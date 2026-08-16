@@ -12,7 +12,7 @@ docs-shell: dev
 
 .PHONY: docs-build
 docs-build: dev
-	docker compose exec pages build
+	docker compose exec pages mdbook build
 
 .PHONY: ci
 ci:

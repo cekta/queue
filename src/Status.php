@@ -36,6 +36,8 @@ enum Status: string
      */
     case FAIL_STALE = 'fail_stale';
 
+    case FAIL_HANDLER_NOT_FOUND = 'fail_handler_not_found';
+
     /**
      * The task failed due to an unexpected, catastrophic infrastructure error (e.g., sudden OOM or hard server crash).
      */

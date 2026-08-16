@@ -11,7 +11,6 @@ final readonly class TaskDTO implements Task
     public function __construct(
         private string $uuid,
         private string $fqcn,
-        private string $handler,
         private mixed $payload,
         private Status $status,
         private DateTimeImmutable $createdAt,
@@ -28,11 +27,6 @@ final readonly class TaskDTO implements Task
     public function getFqcn(): string
     {
         return $this->fqcn;
-    }
-
-    public function getHandler(): string
-    {
-        return $this->handler;
     }
 
     public function getPayload(): mixed
