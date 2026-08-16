@@ -6,9 +6,9 @@ dev:
 shell: dev
 	docker compose exec app sh
 
-.PHONY: shell-docs
-shell-docs: dev
-	ocker compose exec pages sh
+.PHONY: docs-shell
+docs-shell: dev
+	docker compose exec pages sh
 
 .PHONY: docs-build
 docs-build: dev
@@ -22,7 +22,7 @@ ci:
 test-8.3:
 	docker compose down
 	PHP_VERSION=8.3 docker compose build
-	make dev
+	$(MAKE) dev
 	docker compose exec app composer update
 	docker compose exec app composer test
 
@@ -30,7 +30,7 @@ test-8.3:
 test-8.4:
 	docker compose down
 	PHP_VERSION=8.4 docker compose build
-	make dev
+	$(MAKE) dev
 	docker compose exec app composer update
 	docker compose exec app composer test
 
@@ -38,6 +38,6 @@ test-8.4:
 test-8.5:
 	docker compose down
 	PHP_VERSION=8.5 docker compose build
-	make dev
+	$(MAKE) dev
 	docker compose exec app composer update
 	docker compose exec app composer test
