@@ -12,5 +12,5 @@ interface StaleCleaner
      *
      * @return string[] Array of UUIDs of the jobs that were marked as failed.
      */
-    public function clean(): array;
+    public function clean(int $expiredSecond = 60 * 60 * 4): array;
 }
